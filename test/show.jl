@@ -1628,7 +1628,7 @@ end
 
     b = IOBuffer()
     show(IOContext(b, :module => @__MODULE__), TestShowType.TypeA)
-    @test String(take!(b)) == "$(@__MODULE__).TestShowType.TypeA"
+    @test String(take!(b)) == "TestShowType.TypeA"
 
     b = IOBuffer()
     show(IOContext(b, :module => TestShowType), TestShowType.TypeA)
@@ -2162,3 +2162,15 @@ end
     s = sprint(show, MIME("text/plain"), Function)
     @test s == "Function"
 end
+
+# issue #39834, minimal qualifying of module paths in printing
+module M39834
+export A39834
+module A39834
+struct Foo end
+end
+struct (+) end
+end
+using .M39834
+@test sprint(show, M39834.A39834.Foo, context = :module => @__MODULE__) == "A39834.Foo"
+@test sprint(show, M39834.:+, context = :module => @__MODULE__) == "M39834.:+"

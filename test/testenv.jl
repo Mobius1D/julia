@@ -41,8 +41,10 @@ if !@isdefined(testenv_defined)
     end
 
     const curmod = @__MODULE__
-    const curmod_name = fullname(curmod)
-    const curmod_str = curmod === Main ? "Main" : join(curmod_name, ".")
+    const curmod_name = let fn = fullname(curmod)
+        fn[1] === :Main ? fn[2:end] : fn
+    end
+    const curmod_str = join(curmod_name, ".")
     const curmod_prefix = "$(["$m." for m in curmod_name]...)"
 
     # platforms that support cfunction with closures
